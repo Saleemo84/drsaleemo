@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Saleem Dental Clinic</title>
+
+    <!-- Font Awesome (local fallback if CDN fails) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="if(!this.sheet) fallbackFontAwesome()" />
+    <script>
+        function fallbackFontAwesome() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css';
+            document.head.appendChild(link);
+        }
+    </script>
+
+    <!-- Chart.js and jsQR (with fallback) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="#manifest">
+    <meta name="theme-color" content="#1976D2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Dental Clinic">
+
+    <style>
+        :root {
+            --primary: #1976D2;
+            --primary-dark: #1565C0;
+            --primary-light: #BBDEFB;
+            --secondary: #FF4081;
+            --accent: #00BFA5;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --error: #F44336;
+            --gray-50: #FAFAFA;
+            --gray-100: #F5F5F5;
+            --gray-200: #EEEEEE;
+            --gray-300: #E0E0E0;
+            --gray-400: #BDBDBD;
+            --gray-500: #9E9E9E;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            --gray-800: #424242;
+            --gray-900: #212121;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1), 0 5px 10px rgba(0,0,0,0.05);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e3e8f0 100%);
+            color: var(--gray-800);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding: 0;
+            transition: background 0.3s;
+        }
+
+        body.rtl {
+            direction: rtl;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            box-shadow: var(--shadow-lg);
+            background: white;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 1rem;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 0 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            margin-right: 0.75rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-item i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: var(--gray-50);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .clinic-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .clinic-phone, .current-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .current-time {
+            background: var(--primary-light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: var(--primary-dark);
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.875rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Patient Cards */
+        .patient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .patient-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .patient-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .patient-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-800);
+        }
+
+        .patient-code {
+            background: var(--primary-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .patient-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Scanner */
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        #scanner-video {
+            width: 100%;
+            background: var(--gray-900);
+            display: block;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--primary);
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .scan-line {
+            position: absolute;
+            height: 2px;
+            width: 100%;
+            background: var(--primary);
+            animation: scan 2s infinite linear;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .scanner-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+        }
+
+        .close-modal:hover {
+            color: var(--error);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: var(--success);
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1100;
+            display: none;
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-container, .print-container * {
+                visibility: visible;
+            }
+            .print-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .print-card {
+                page-break-after: always;
+            }
+            .action-buttons, .header, .modal, .scanner-container {
+                display: none !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .app-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-tooth"></i></div>
+                <div class="logo-text">Dr. Saleem Dental Clinic</div>
+            </div>
+            <nav class="nav-items">
+                <div class="nav-item active" data-tab="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span data-i18n="dashboard">Dashboard</span>
+                </div>
+                <div class="nav-item" data-tab="patients">
+                    <i class="fas fa-user-injured"></i>
+                    <span data-i18n="patients">Patients</span>
+                </div>
+                <div class="nav-item" data-tab="backup">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span data-i18n="backup">Backup</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="clinic-info">
+                    <div class="clinic-phone">
+                        <i class="fas fa-phone"></i>
+                        <span>07507816500</span>
+                    </div>
+                    <div class="current-time">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTime">Loading...</span>
+                    </div>
+                </div>
+                <div class="language-switcher">
+                    <button class="lang-btn active" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="ar">AR</button>
+                </div>
+            </header>
+
+            <!-- Dashboard -->
+            <div id="dashboard" class="tab-content active">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title" data-i18n="today-appointments">Today's Appointments</div>
+                            <button class="btn btn-primary" onclick="openModal('addPatientModal')">
+                                <i class="fas fa-plus"></i> <span data-i18n="add-patient">Add Patient</span>
+                            </button>
+                        </div>
+                        <div id="appointmentList"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title" data-i18n="recent-patients">Recent Patients</div>
+                        </div>
+                        <div id="dashboardPatientList" class="patient-grid"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title" data-i18n="income-vs-expenditure">Income vs Expenditure</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="financeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patients -->
+            <div id="patients" class="tab-content" style="display:none">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title" data-i18n="patient-management">Patient Management</div>
+                        <div class="search-container">
+                            <input type="text" class="search-input" id="patientSearch" placeholder="Search patients...">
+                            <div class="search-icon"><i class="fas fa-search"></i></div>
+                        </div>
+                    </div>
+                    <div class="patient-actions">
+                        <button class="btn btn-primary" onclick="openModal('addPatientModal')">
+                            <i class="fas fa-plus"></i> <span data-i18n="add-patient">Add Patient</span>
+                        </button>
+                        <button class="btn btn-accent" onclick="openScannerModal()">
+                            <i class="fas fa-camera"></i> <span data-i18n="scan-card">Scan Card</span>
+                        </button>
+                        <button class="btn btn-success" onclick="printPatientCards()">
+                            <i class="fas fa-print"></i> <span data-i18n="print-cards">Print Cards</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportData()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button class="btn btn-warning" onclick="document.getElementById('importFile').click()">
+                            <i class="fas fa-upload"></i> Import
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+                    </div>
+                    <div id="patientList" class="patient-grid"></div>
+                </div>
+            </div>
+
+            <!-- Backup Tab -->
+            <div id="backup" class="tab-content" style="display:none">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Backup & Sync</div>
+                    </div>
+                    <p style="padding:1rem">Use Export/Import above to backup your data.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Patient Modal -->
+    <div class="modal" id="addPatientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="add-new-patient">Add New Patient</h2>
+                <button class="close-modal" onclick="closeModal('addPatientModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="patientName" data-i18n="full-name">Full Name</label>
+                <input type="text" id="patientName">
+            </div>
+            <div class="form-group">
+                <label for="patientPhone" data-i18n="phone-number">Phone Number</label>
+                <input type="tel" id="patientPhone">
+            </div>
+            <button class="btn btn-primary" onclick="addNewPatient()" style="width:100%">
+                <i class="fas fa-save"></i> Save
+            </button>
+        </div>
+    </div>
+
+    <!-- Scanner Modal -->
+    <div class="modal" id="scannerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Scan Patient Card</h2>
+                <button class="close-modal" onclick="closeScanner()">&times;</button>
+            </div>
+            <div class="scanner-container">
+                <video id="scanner-video" autoplay playsinline></video>
+                <div class="scanner-overlay"><div class="scan-line"></div></div>
+            </div>
+            <div class="scanner-actions">
+                <button class="btn btn-primary" id="startScanner" onclick="initScanner()">
+                    <i class="fas fa-play"></i> Start
+                </button>
+                <button class="btn btn-danger" onclick="closeScanner()">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+            <div id="scanResult" style="margin-top:20px;display:none">
+                <h3>Scan Result:</h3>
+                <pre id="scannedData"></pre>
+                <button class="btn btn-success" onclick="restorePatientData()">
+                    <i class="fas fa-history"></i> Restore Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Success</span>
+    </div>
+
+    <script>
+        // Clinic Data
+        const clinicData = {
+            patients: [],
+            appointments: [],
+            financials: {}
+        };
+
+        // Translations
+        const translations = {
+            en: {
+                dashboard: "Dashboard",
+                patients: "Patients",
+                "add-patient": "Add Patient",
+                "scan-card": "Scan Patient Card",
+                "print-cards": "Print Patient Cards",
+                "patient-management": "Patient Management",
+                "full-name": "Full Name",
+                "phone-number": "Phone Number",
+                "add-new-patient": "Add New Patient",
+                "today-appointments": "Today's Appointments",
+                "recent-patients": "Recent Patients",
+                "income-vs-expenditure": "Income vs Expenditure",
+                "backup": "Backup",
+                success: "Operation successful",
+                error: "Error occurred"
+            },
+            ar: {
+                dashboard: "لوحة التحكم",
+                patients: "المرضى",
+                "add-patient": "إضافة مريض",
+                "scan-card": "مسح البطاقة",
+                "print-cards": "طباعة البطاقات",
+                "patient-management": "إدارة المرضى",
+                "full-name": "الاسم الكامل",
+                "phone-number": "رقم الهاتف",
+                "add-new-patient": "إضافة مريض جديد",
+                "today-appointments": "مواعيد اليوم",
+                "recent-patients": "المرضى الجدد",
+                "income-vs-expenditure": "الإيرادات مقابل المصروفات",
+                "backup": "النسخ الاحتياطي",
+                success: "تمت العملية بنجاح",
+                error: "حدث خطأ"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            if (lang === 'ar') {
+                document.body.classList.add('rtl');
+            } else {
+                document.body.classList.remove('rtl');
+            }
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-lang="${lang}"]`).classList.add('active');
+        }
+
+        // App Init
+        document.addEventListener('DOMContentLoaded', () => {
+            setLanguage('en');
+            loadFromLocalStorage();
+            initApp();
+        });
+
+        function initApp() {
+            updateClock(); setInterval(updateClock, 1000);
+            setupTabs();
+            setupLanguage();
+            loadDashboard();
+            initFinanceChart();
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    const tab = item.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+                    document.getElementById(tab).style.display = 'block';
+                    if (tab === 'patients') loadPatients();
+                });
+            });
+        }
+
+        function setupLanguage() {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setLanguage(btn.getAttribute('data-lang'));
+                });
+            });
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+        }
+
+        function loadDashboard() {
+            const today = new Date().toISOString().split('T')[0];
+            const appts = clinicData.appointments.filter(a => a.date === today);
+            const list = document.getElementById('appointmentList');
+            list.innerHTML = appts.length ? appts.map(a => `
+                <div class="appointment-item">
+                    <div><b>${a.patientName}</b><br>${a.time}</div>
+                </div>`).join('') : 'No appointments';
+
+            const recent = clinicData.patients.slice(0, 4);
+            const grid = document.getElementById('dashboardPatientList');
+            grid.innerHTML = '';
+            recent.forEach(p => grid.appendChild(createPatientCard(p)));
+        }
+
+        function loadPatients() {
+            const grid = document.getElementById('patientList');
+            grid.innerHTML = '';
+            clinicData.patients.forEach(p => grid.appendChild(createPatientCard(p)));
+        }
+
+        function createPatientCard(patient) {
+            const card = document.createElement('div');
+            card.className = 'patient-card';
+            card.innerHTML = `
+                <div class="patient-name">${patient.name}</div>
+                <div class="patient-code">${patient.code}</div>
+                <div class="patient-detail"><span class="detail-label">Phone:</span> ${patient.phone}</div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="call('${patient.phone}')"><i class="fas fa-phone"></i> Call</button>
+                    <button class="btn btn-success" onclick="whatsapp('${patient.phone}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                </div>
+            `;
+            return card;
+        }
+
+        function call(phone) { showToast(`Calling ${phone}...`); }
+        function whatsapp(phone) { showToast(`WhatsApp: ${phone}`); }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function addNewPatient() {
+            const name = document.getElementById('patientName').value;
+            const phone = document.getElementById('patientPhone').value;
+            if (!name || !phone) return showToast('Name and phone required', 'error');
+
+            const code = `PT-${Date.now().toString().slice(-6)}`;
+            clinicData.patients.push({ id: Date.now(), name, phone, code, lastVisit: new Date().toISOString().split('T')[0] });
+            saveToStorage();
+            showToast(`Patient ${name} added!`);
+            closeModal('addPatientModal');
+            document.getElementById('patientName').value = '';
+            document.getElementById('patientPhone').value = '';
+            loadPatients();
+            loadDashboard();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('clinicData', JSON.stringify(clinicData));
+        }
+
+        function loadFromLocalStorage() {
+            const data = localStorage.getItem('clinicData');
+            if (data) {
+                Object.assign(clinicData, JSON.parse(data));
+            } else {
+                // Seed data
+                clinicData.patients = [
+                    { id: 1, name: 'Ahmed Mohamed', phone: '07507816500', code: 'PT-000001', lastVisit: '2023-06-20' }
+                ];
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.className = 'toast';
+            t.classList.add(type === 'error' ? 'bg-error' : '');
+            document.getElementById('toastMessage').textContent = msg;
+            t.style.display = 'flex';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        // QR Scanner
+        let scannerActive = false;
+        function openScannerModal() {
+            document.getElementById('scannerModal').style.display = 'flex';
+            document.getElementById('scanResult').style.display = 'none';
+        }
+
+        function initScanner() {
+            const video = document.getElementById('scanner-video');
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                    scannerActive = true;
+                    document.getElementById('startScanner').disabled = true;
+                    scanLoop(video);
+                })
+                .catch(err => showToast("Camera error: " + err.message, 'error'));
+        }
+
+        function scanLoop(video) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            function tick() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(img.data, img.width, img.height);
+                    if (code) {
+                        try {
+                            const data = JSON.parse(code.data);
+                            document.getElementById('scannedData').textContent = JSON.stringify(data, null, 2);
+                            document.getElementById('scanResult').style.display = 'block';
+                            scannerActive = false;
+                            video.srcObject.getTracks().forEach(t => t.stop());
+                        } catch (e) {
+                            showToast("Invalid QR", 'error');
+                        }
+                    }
+                }
+                if (scannerActive) requestAnimationFrame(tick);
+            }
+            tick();
+        }
+
+        function closeScanner() {
+            scannerActive = false;
+            const video = document.getElementById('scanner-video');
+            if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+            document.getElementById('scannerModal').style.display = 'none';
+            document.getElementById('startScanner').disabled = false;
+        }
+
+        // Export/Import
+        function exportData() {
+            const data = JSON.stringify(clinicData, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dental-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    Object.assign(clinicData, data);
+                    saveToStorage();
+                    loadPatients();
+                    showToast("Data imported!");
+                } catch (err) {
+                    showToast("Import failed", "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Print Patient Cards
+        function printPatientCards() {
+            const w = window.open();
+            w.document.write(`
+                <html><head><title>Print Patient Cards</title></head><body>
+                <div class="print-container">`);
+            clinicData.patients.forEach(p => {
+                w.document.write(`
+                <div class="print-card" style="border:1px solid #000;padding:20px;margin:20px;">
+                    <h3>Patient ID Card</h3>
+                    <p><b>Name:</b> ${p.name}</p>
+                    <p><b>Code:</b> ${p.code}</p>
+                    <p><b>Phone:</b> ${p.phone}</p>
+                    <div style="height:150px;background:#eee;display:flex;align-items:center;justify-content:center;">
+                        [QR CODE PLACEHOLDER]
+                    </div>
+                </div>`);
+            });
+            w.document.write(`</div></body></html>`);
+            w.document.close();
+            setTimeout(() => w.print(), 500);
+        }
+
+        // Finance Chart
+        function initFinanceChart() {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar'],
+                    datasets: [{
+                        label: 'Income',
+                        data: [3000000, 3200000, 3500000],
+                        backgroundColor: 'rgba(25,118,210,0.7)'
+                    }, {
+                        label: 'Expenditure',
+                        data: [1800000, 1900000, 2000000],
+                        backgroundColor: 'rgba(244,67,54,0.7)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // PWA: Install Service Worker if supported
+        if ('serviceWorker' in navigator) {
+            const sw = `self.addEventListener('fetch', e => {
+                e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+            });`;
+            const blob = new Blob([sw], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(url).catch(console.error);
+        }
+    </script>
+
+    <!-- Manifest for PWA -->
+    <script type="application/ld+json" id="manifest">
+        {
+            "name": "Dental Clinic",
+            "short_name": "Clinic",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#f5f7fa",
+            "theme_color": "#1976D2"
+        }
+    </script>
+</body>
+</html>
